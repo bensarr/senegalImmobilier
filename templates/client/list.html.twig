@@ -1,0 +1,42 @@
+{% extends 'accueil.html.twig' %}
+
+{% block title %}Agents{% endblock %}
+
+{% block body %}
+    <div class="container col-md-12 mt-5">
+        <div class="card bg-transparent">
+            {% for message in app.flashes('notice') %}
+                <div class="card-header flash-notice alert-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            <div class="card-header bg-dark text-light text-left">
+                <a class="btn btn-light" href="{{ path('add_client',{'id': 0}) }}"><i class="fa fa-plus"></i></a>
+                Liste des Clients
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prenom</th>
+                        <th>Telephone</th>
+                        <th>Adresse</th>
+                        <th>Actions</th>
+                    </tr>
+                    {% for c in clients %}
+                        <tr>
+                            <td>{{ c.nom }} </td>
+                            <td>{{ c.prenom }} </td>
+                            <td>{{ c.telephone }} </td>
+                            <td>{{ c.adresse }} </td>
+                            <td>
+                                <a class="btn btn-info" href="{{ path('add_client',{'id':c.id} ) }}"><i class="fa fa-edit"></i></a>
+                                <a class="btn btn-primary" href="{{ path('list_operation',{'id':c.id} ) }}"><i class="fa fa-money-check"></i></a>
+                            </td>
+                        </tr>
+                    {%endfor%}
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

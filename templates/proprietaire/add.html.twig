@@ -1,0 +1,66 @@
+{% extends 'accueil.html.twig' %}
+
+{% block title %}Agents{% endblock %}
+
+{% block body %}
+    <div class="container col-md-10 mt-5">
+        <div class="card bg-transparent">
+            {% for message in app.flashes('notice') %}
+                <div class="card-header flash-notice alert-danger">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            <div class="card-header bg-dark text-light text-center">
+                Formulaire Proprietaires
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ path('persiste_proprietaire') }}">
+                    <div class="form-group">
+                        <label for="numero">Numéro de carte national d'identité</label>
+                        <input type="text" required class="form-control" id="numero" name="numero" placeholder="NCI du proprietaire" {% if proprietaire!=null%} value="{{ proprietaire.numero }}"{%endif%}>
+                    </div>
+                    <div class="form-group">
+                        <label for="nom">Nom</label>
+                        <input type="text" required class="form-control" id="nom" name="nom" placeholder="Nom du proprietaire" {% if proprietaire!=null%} value="{{ proprietaire.nom }}"{%endif%}>
+                    </div>
+                    <div class="form-group">
+                        <label for="prenom">Prenom</label>
+                        <input type="text" required class="form-control" id="prenom" name="prenom" placeholder="Prenom du proprietaire" {% if proprietaire!=null%} value="{{ proprietaire.prenom }}"{%endif%}>
+                    </div>
+                    <div class="form-group">
+                        <label for="telephone">Telephone</label>
+                        <input type="tel" class="form-control" id="telephone" name="telephone" placeholder="Telephone de l'Agent" {% if proprietaire!=null%} value="{{ proprietaire.telephone }}"{%endif%}>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="reset" class="btn btn-danger">
+                            Annuler
+                        </button>
+                        <button type="submit" id="btn_submit" class="btn btn-success">
+                            Valider
+                        </button>
+                        <input type="hidden" id="id" name="id" {% if proprietaire!=null%} value="{{ proprietaire.id }}" {% else%} value="0"{%endif%}>
+                        <input type="hidden" name="proprietaire_token"
+                               value="{{ csrf_token('proprietaire') }}"
+                        >
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block dynamicJS%}
+    <script type="application/javascript">
+        $(document).ready(
+            function (){
+                if($('#id').val() > 0)
+                {
+                    $('#numero').attr('readonly', true);
+                    $('#nom').attr('readonly', true);
+                    $('#prenom').attr('readonly', true);
+                }
+            }
+        );
+    </script>
+{% endblock %}

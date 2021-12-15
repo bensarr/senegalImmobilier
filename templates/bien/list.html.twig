@@ -1,0 +1,74 @@
+{% extends 'accueil.html.twig' %}
+
+{% block title %}Biens{% endblock %}
+
+{% block body %}
+    <div class="container col-md-12 mt-5">
+        <div class="card bg-transparent">
+            {% for message in app.flashes('notice') %}
+                <div class="card-header flash-notice alert-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            <div class="card-header bg-dark text-light text-left">
+                {% if proprietaire != null %}
+                    <a class="btn btn-light" href="{{ path('add_bien',{'id': proprietaire.id, 'idB':0}) }}">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                {% endif %}
+                Liste des
+                Biens {% if proprietaire != null %} du Client {{ proprietaire.nom }} {{ proprietaire.prenom }} {% endif %}
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tr>
+                        <th>Numero</th>
+                        <th>Propriétaire</th>
+                        <th>Type</th>
+                        <th>Date de MAD</th>
+                        <th>Libelle</th>
+                        <th>Contrat</th>
+                        <th>Localisation</th>
+                        <th>Intension</th>
+                        <th>Actions</th>
+                    </tr>
+                    {% for b in biens %}
+                        <tr>
+                            <td>{{ b.numero }} </td>
+                            <td>{{ b.proprietaire.nom }} {{ b.proprietaire.prenom }} </td>
+                            <td>
+                                {% if b.maison!=null%}
+                                    Maison
+                                {%endif%}
+                                {% if b.appartement!=null%}
+                                    Appartement
+                                {%endif%}
+                                {% if b.terrain!=null%}
+                                    Terrain
+                                {%endif%}
+                                {% if b.studio!=null%}
+                                    Studio
+                                {%endif%}
+                            </td>
+                            <td>{{ b.date|date('d/m/y')  }} </td>
+                            <td>{{ b.libelle }} </td>
+                            <td>{{ b.contrat.reference }} </td>
+                            <td>
+                                Rue: {{ b.localisation.rue }}<br>
+                                Code Postale: {{ b.localisation.codePostal }}<br>
+                                Localité: {{ b.localisation.localiste }}
+                            </td>
+                            <td>{{ b.besoin }}</td>
+                            <td>
+                                <a class="btn btn-info" href="{{ path('add_bien',{'id':b.proprietaire.id, 'idB':b.id } ) }}">
+                                    <i class="fa fa-cogs"></i>
+                                </a>
+                            </td>
+                            {# <td><a class="btn btn-primary" href="{{ path('liste_factures',{'id':a.compteur.id} ) }}"><i class="fa fa-print"></i></a></td> #}
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

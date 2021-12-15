@@ -1,0 +1,209 @@
+{% extends 'accueil.html.twig' %}
+
+{% block title %}Agents{% endblock %}
+
+{% block body %}
+    <div class="container col-md-10 mt-5">
+        <div class="card bg-transparent">
+            {% for message in app.flashes('notice') %}
+                <div class="card-header flash-notice alert-danger">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            <div class="card-header bg-dark text-light text-center">
+                Formulaire Proprietés de {{ proprietaire.nom }} {{ proprietaire.prenom }}
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ path('persiste_bien') }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="numero_contrat">Numéro de Contrat</label>
+                        <input type="text" required class="form-control" id="numero_contrat" name="numero_contrat" placeholder="Numero de contrat de la propriété" {% if bien!=null%} value="{{ bien.contrat.reference }}" readonly="readonly"{%endif%}>
+                    </div>
+                    <div class="form-group">
+                        <label for="libelle">Libelle</label>
+                        <input type="text" required class="form-control" id="libelle" name="libelle" placeholder="Libelle de la propriété" {% if bien!=null%} value="{{ bien.libelle }}" readonly="readonly"{%endif%}>
+                    </div>
+                    <div class="form-group">
+                        <label for="rue">Rue</label>
+                        <input type="text" required class="form-control" id="rue" name="rue" placeholder="Rue de la propriété" {% if bien!=null%} value="{{ bien.localisation.rue }}" readonly="readonly"{%endif%}>
+                    </div>
+                    <div class="form-group">
+                        <label for="code_postal">Code Postal</label>
+                        <input type="text" required class="form-control" id="code_postal" name="code_postal" placeholder="Code Postal de la propriété" {% if bien!=null%} value="{{ bien.localisation.codePostal }}" readonly="readonly"{%endif%}>
+                    </div>
+                    <div class="form-group">
+                        <label for="localite">Localité</label>
+                        <input type="text" required class="form-control" id="localite" name="localite" placeholder="localité de la propriété" {% if bien!=null%} value="{{ bien.localisation.localiste }}" readonly="readonly"{%endif%}>
+                    </div>
+                    <div class="form-group">
+                        <label for="besoin">Type de Besoins</label>
+                        <select required {% if bien!=null%} readonly="readonly" {%endif%} class="form-control" id="besoin" name="besoin" data-live-search="true" title="Choisissez le type besoins de la propriété">
+                            <option value="" disabled selected></option>
+                            {% for b in besoins %}
+                                <option value="{{ b }}"
+                                    {% if bien!=null and bien.besoin == b%}
+                                        selected="selected"
+                                    {% endif %}
+                                >
+                                    {{ b }}
+                                </option>
+                            {% endfor%}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="type">Type de Bien</label>
+                        <select required {% if bien!=null%} readonly="readonly" {%endif%} class="form-control" id="type" name="type" data-live-search="true" title="Choisissez le type de la propriété">
+                            <option value="" disabled selected></option>
+                            {% for t in types %}
+                                <option value="{{ t }}"
+                                        {% if bien!=null%}
+                                            {% if bien.maison!=null  and t == "Maison"%}
+                                                selected="selected"
+                                            {%endif%}
+                                            {% if bien.appartement!=null  and t == "Appartement"%}
+                                                selected="selected"
+                                            {%endif%}
+                                            {% if bien.terrain!=null   and t == "Terrain"%}
+                                                selected="selected"
+                                            {%endif%}
+                                            {% if bien.studio!=null  and t == "Studio"%}
+                                                selected="selected"
+                                            {%endif%}
+                                        {%endif%}
+                                >
+                                    {{ t }}
+                                </option>
+                            {% endfor%}
+                        </select>
+                    </div>
+                    <div class="dispayAfter">
+                    </div>
+
+                    <div class="form-group">
+                        <button type="reset" id="btn_danger" class="btn btn-danger">
+                            Annuler
+                        </button>
+                        <button type="submit" id="btn_submit" class="btn btn-success">
+                            Valider
+                        </button>
+                        <input type="hidden" id="id" name="id" {% if bien!=null%} value="{{ bien.id }}" {% else%} value="0"{%endif%}>
+                        <input type="hidden" id="id" name="idP" value="{{ proprietaire.id }}">
+                        <input type="hidden" name="bien_token"
+                               value="{{ csrf_token('bien') }}"
+                        >
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block dynamicJS%}
+    <script type="application/javascript">
+        function showBlockTypes(type){
+            var group =[];
+            if(type === 'Maison')
+                group[type] = {
+                    name: type,
+                    block: " <div class='form-group'>" +
+                        "<label for='prix'>Prix Maison</label>" +
+                        "<input type='number' required class='form-control' id='prix' name='prix' placeholder='Prix de la maison' {% if bien!=null and bien.maison!=null %} readonly='readonly' value='{{ bien.maison.prix }}'{% endif %}>"
+                        + "</div>\n" +
+                        " <div class='form-group'>" +
+                        "<label for='etat'>Etat de la Maison</label>" +
+                        "<select required class='form-control' id='etat' name='etat' title='Sélectionnez l etat de la maison' {% if bien!=null and bien.maison!=null %} readonly='readonly' value='{{ bien.maison.etat }}'{% endif %}>" +
+                        "<option value='' disabled selected></option>" +
+                        "<option value='En construction'>En construction</option>" +
+                        "<option value='A Rénover'>A Rénover</option>" +
+                        "<option value='Construction Terminéé'>Construction Terminée</option>" +
+                        "</select>"
+                        + "</div>\n"
+                };
+            if(type === 'Appartement')
+                group[type] = {
+                    name: type,
+                    block: " <div class='form-group'>" +
+                        "<label for='loyer'>Loyer Mensuel</label>" +
+                        "<input type='number' required class='form-control' id='loyer' name='loyer' placeholder='Loyer Mensuel de l Appartement' {% if bien!=null and bien.appartement!=null %} readonly='readonly' value='{{ bien.appartement.loyerMensuel }}'{% endif %}>"
+                        + "</div>\n" +
+                        " <div class='form-group'>" +
+                        "<label for='caution'>Caution</label>" +
+                        "<input type='number' required class='form-control' id='caution' name='caution' placeholder='Montant Caution de l Appartement' {% if bien!=null and bien.appartement!=null %} readonly='readonly' value='{{ bien.appartement.montantCaution }}'{% endif %}>"
+                        + "</div>\n" +
+                        " <div class='form-group'>" +
+                        "<label for='chambres'>Nombre de Chambre</label>" +
+                        "<input type='number' required class='form-control' id='chambres' name='chambres' placeholder='Nombre de chambres de l Appartement' {% if bien!=null and bien.appartement!=null %} readonly='readonly' value='{{ bien.appartement.nbrChambre }}'{% endif %}>"
+                        + "</div>\n"
+                };
+            if(type === 'Studio')
+                group[type] = {
+                    name: type,
+                    block: " <div class='form-group'>" +
+                        "<label for='loyer'>Loyer Mensuel</label>" +
+                        "<input type='number' required class='form-control' id='loyer' name='loyer' placeholder='Loyer Mensuel de l Appartement' {% if bien!=null and bien.studio!=null %} readonly='readonly' value='{{ bien.studio.loyerMensuel }}'{% endif %}>"
+                        + "</div>\n" +
+                        " <div class='form-group'>" +
+                        "<label for='caution'>Caution</label>" +
+                        "<input type='number' required class='form-control' id='caution' name='caution' placeholder='Montant Caution de l Appartement' {% if bien!=null and bien.studio!=null %} readonly='readonly' value='{{ bien.studio.montantCaution }}'{% endif %}>"
+                        + "</div>\n" +
+                        " <div class='form-group'>" +
+                        "<label for='superficie'>Superficie</label>" +
+                        "<input type='number' required class='form-control' id='superficie' name='superficie' placeholder='Superficie de l Appartement' {% if bien!=null and bien.studio!=null %} readonly='readonly' value='{{ bien.studio.superficie }}'{% endif %}>"
+                        + "</div>\n"
+                };
+            if(type === 'Terrain')
+                group[type] = {
+                    name: type,
+                    block: " <div class='form-group'>" +
+                        "<label for='prix'>Prix</label>" +
+                        "<input type='number' required class='form-control' id='prix' name='prix' placeholder='prix du Terrain' {% if bien!=null and bien.terrain!=null %} readonly='readonly' value='{{ bien.terrain.prix }}'{% endif %}>"
+                        + "</div>\n" +
+                        " <div class='form-group'>" +
+                        "<label for='superficie'>Superficie</label>" +
+                        "<input type='number' required class='form-control' id='superficie' name='superficie' placeholder='Superficie du Terrain' {% if bien!=null and bien.terrain!=null %} readonly='readonly' value='{{ bien.terrain.superficie }}'{% endif %}>"
+                        + "</div>\n"
+                };
+            $('.dispayAfter').empty();
+            $('.dispayAfter').append(group[type].block);
+            $('.dispayAfter').show();
+        }
+        $(document).ready(
+            function (){
+                if($('#id').val() > 0)
+                {
+                    $('.dispayAfter').show();
+                    var type = "{% if bien!=null and bien.maison!=null%}"+
+                            "Maison"+
+                            "{%endif%}"+
+                            "{% if bien!=null and bien.appartement!=null%}"+
+                            "Appartement"+
+                            "{%endif%}"+
+                            "{% if bien!=null and bien.terrain!=null%}"+
+                            "Terrain"
+                            "{%endif%}"+
+                            "{% if bien!=null and bien.studio!=null%}"+
+                            "Studio"+
+                            "{%endif%}";
+                    showBlockTypes(type);
+                    $('#btn_submit').hide();
+                    $('#btn_danger').hide();
+                    if(type === "Maison")
+                    {
+                        {% if bien!=null and bien.maison!=null%}
+                            $('#etat').empty();
+                            $('#etat').append("<option value='{{ bien.maison.etat }}'>{{ bien.maison.etat }}</option>");
+                        {%endif%};
+                    }
+                }
+                else
+                {
+                    $('.dispayAfter').hide();
+                    $('#type').change(function () {
+                        var type = $('#type').val();
+                        showBlockTypes(type);
+                    });
+                }
+            }
+        );
+    </script>
+{% endblock %}

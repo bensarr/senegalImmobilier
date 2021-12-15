@@ -1,0 +1,42 @@
+{% extends 'accueil.html.twig' %}
+
+{% block title %}Agents{% endblock %}
+
+{% block body %}
+    <div class="container col-md-12 mt-5">
+        <div class="card bg-transparent">
+            {% for message in app.flashes('notice') %}
+                <div class="card-header flash-notice alert-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            <div class="card-header bg-dark text-light text-left">
+                <a class="btn btn-light" href="{{ path('add_proprietaire',{'id': 0}) }}"><i class="fa fa-plus"></i></a>
+                Liste des Proprietaires
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tr>
+                        <th>NCI</th>
+                        <th>Nom</th>
+                        <th>Prenom</th>
+                        <th>Telephone</th>
+                        <th>Actions</th>
+                    </tr>
+                    {% for p in proprietaires %}
+                        <tr>
+                            <td>{{ p.numero }} </td>
+                            <td>{{ p.nom }} </td>
+                            <td>{{ p.prenom }} </td>
+                            <td>{{ p.telephone }} </td>
+                            <td>
+                                <a class="btn btn-info" href="{{ path('add_proprietaire',{'id':p.id} ) }}"><i class="fa fa-edit"></i></a>
+                                <a class="btn btn-primary" href="{{ path('list_bien',{'id':p.id} ) }}"><i class="fa fa-home"></i></a>
+                            </td>
+                        </tr>
+                    {%endfor%}
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

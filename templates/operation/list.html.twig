@@ -1,0 +1,57 @@
+{% extends 'accueil.html.twig' %}
+
+{% block title %}Biens{% endblock %}
+
+{% block body %}
+    <div class="container col-md-12 mt-5">
+        <div class="card bg-transparent">
+            {% for message in app.flashes('notice') %}
+                <div class="card-header flash-notice alert-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            <div class="card-header bg-dark text-light text-left">
+                {% if client != null %}
+                    <a class="btn btn-light" href="{{ path('add_operation',{'id': client.id, 'idO':0}) }}">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                {% endif %}
+                Liste des
+                Opérations {% if client != null %} du Client {{ client.nom }} {{ client.prenom }} {% endif %}
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tr>
+                        <th>Identifiant</th>
+                        <th>Type</th>
+                        <th>Client</th>
+                        <th>Date de MAD</th>
+                        <th>Biens</th>
+                        <th>Actions</th>
+                    </tr>
+                    {% for o in operations %}
+                        <tr>
+                            <td>{{ o.id }} </td>
+                            <td>{{ o.type }} </td>
+                            <td>{{ o.client.nom }} {{ o.client.prenom }} </td>
+                            <td>{{ o.date|date('d/m/y')  }} </td>
+                            <td>
+                                Type: {% if o.bien.maison!=null%}Maison{%endif%}
+                                    {% if o.bien.appartement!=null%}Appartement{%endif%}
+                                    {% if o.bien.terrain!=null%}Terrain{%endif%}
+                                    {% if o.bien.studio!=null%}Studio{%endif%} <br>
+                                Libelle: {{ o.bien.libelle }}
+                            </td>
+                            <td>
+                                <a class="btn btn-info" href="{{ path('add_operation',{'id':o.client.id, 'idO':o.id } ) }}">
+                                    <i class="fa fa-cogs"></i>
+                                </a>
+                            </td>
+                            {# <td><a class="btn btn-primary" href="{{ path('liste_factures',{'id':a.compteur.id} ) }}"><i class="fa fa-print"></i></a></td> #}
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
