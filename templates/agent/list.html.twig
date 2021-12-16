@@ -27,8 +27,11 @@
                             <td>{{ a.nom }} </td>
                             <td>{{ a.prenom }} </td>
                             <td>{{ a.telephone }} </td>
-                            <td><a class="btn btn-info" href="{{ path('add_agent',{'id':a.id} ) }}"><i class="fa fa-edit"></i></a></td>
-                            {#<td><a class="btn btn-primary" href="{{ path('liste_factures',{'id':a.compteur.id} ) }}"><i class="fa fa-print"></i></a></td> #}
+                            <td>
+                                <a class="btn btn-info" href="{{ path('add_agent',{'id':a.id} ) }}"><i class="fa fa-edit"></i></a>
+                                {% if a.biens|length == 0 and a.operations|length == 0%}
+                                    <a class="btn btn-danger" href="{{ path('delete_agent',{'id':a.id} ) }}"><i class="fa fa-trash"></i></a></td>
+                                {% endif %}
                         </tr>
                     {%endfor%}
                 </table>

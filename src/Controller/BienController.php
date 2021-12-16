@@ -49,6 +49,41 @@ class BienController extends AbstractController
         );
     }
 
+    #[Route('/bien/delete/{id}', name: 'delete_bien')]
+    public function delete($id)
+    {
+        $b=$this->bienRepository->find($id);
+        if($b!=null)
+        {
+            $proprietaireId = $b->getProprietaire()->getId();
+            if($b->getOperations() != null)
+            {
+                $this->addFlash(
+                    'warning', 'Suppression impossible veiller supprimer ses Operations avant tout'
+                );
+                return $this->redirectToRoute('list_bien', ['id'=> $proprietaireId]);
+            }
+            if($b->getAppartement() != null)
+            {
+                $this->em->remove($b->getAppartement());
+            }
+            if($b->getMaison() != null)
+            {
+                $this->em->remove($b->getMaison());
+            }
+            if($b->getStudio() != null)
+            {
+                $this->em->remove($b->getStudio());
+            }
+            if($b->getTerrain() != null)
+            {
+                $this->em->remove($b->getTerrain());
+            }
+            $this->em->remove($b);
+            $this->em->flush();
+        }
+        return $this->redirectToRoute('list_bien', ['id'=> $proprietaireId]);
+    }
 
     #[Route('/bien/add/{id}/{idB}', name: 'add_bien')]
     public function add($id,$idB): Response

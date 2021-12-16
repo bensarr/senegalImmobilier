@@ -5,6 +5,11 @@
 {% block body %}
     <div class="container col-md-12 mt-5">
         <div class="card bg-transparent">
+            {% for message in app.flashes('warning') %}
+                <div class="card-header flash-notice alert-danger">
+                    {{ message }}
+                </div>
+            {% endfor %}
             {% for message in app.flashes('notice') %}
                 <div class="card-header flash-notice alert-success">
                     {{ message }}
@@ -32,6 +37,7 @@
                             <td>
                                 <a class="btn btn-info" href="{{ path('add_client',{'id':c.id} ) }}"><i class="fa fa-edit"></i></a>
                                 <a class="btn btn-primary" href="{{ path('list_operation',{'id':c.id} ) }}"><i class="fa fa-money-check"></i></a>
+                                <a class="btn btn-danger" href="{{ path('delete_client',{'id':c.id} ) }}"><i class="fa fa-trash"></i></a>
                             </td>
                         </tr>
                     {%endfor%}

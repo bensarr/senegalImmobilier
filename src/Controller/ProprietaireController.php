@@ -83,6 +83,25 @@ class ProprietaireController extends AbstractController
         return $this->redirectToRoute('add_proprietaire');
     }
 
+    #[Route('/proprietaire/delete/{id}', name: 'delete_proprietaire')]
+    public function delete($id)
+    {
+        $p=$this->proprietaireRepository->find($id);
+        if($p!=null)
+        {
+            if($p->getBiens() != null)
+            {
+                $this->addFlash(
+                    'warning', 'Suppression impossible veiller supprimer ses Biens avant tout'
+                );
+                return $this->redirectToRoute('list_proprietaire');
+            }
+            $this->em->remove($p);
+            $this->em->flush();
+        }
+        return $this->redirectToRoute('list_proprietaire');
+    }
+
     #[Route('/proprietaire/bien/persiste', name: 'persiste_bien')]
     public function persisteBien(Request $request): Response
     {
@@ -156,7 +175,6 @@ class ProprietaireController extends AbstractController
                 return $this->redirectToRoute('list_bien',['id'=>$request->request->get('idP')]);
             }
         }
-
         return $this->redirectToRoute('list_bien',['id'=>$request->request->get('idP')]);
     }
 }

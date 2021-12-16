@@ -57,9 +57,28 @@ class OperationController extends AbstractController
         );
     }
 
-    #[Route('/operation/persiste', name: 'persiste_operation')]
-    public function persiste(Request $request): Response
+    #[Route('/operation/delete/{id}', name: 'delete_operation')]
+    public function delete($id)
     {
-        return $this->redirectToRoute('list_operation');
+        $o=$this->operationRepository->find($id);
+        $clientId = $o->getClient()->getId();
+        if($o!=null)
+        {
+            if($o->getFacture() != null)
+            {
+                $this->addFlash(
+                    'warning', 'Suppression impossible veiller supprimer ses Factures avant tout'
+                );
+                return $this->redirectToRoute('list_operation', ['id'=>$clientId]);
+            }
+            if($o->getContrat() != null)
+            {
+                $o->setContrat(null);
+            }
+            $o->getBien()->setStatut(true);
+            $this->em->remove($o);
+            $this->em->flush();
+        }
+        return $this->redirectToRoute('list_operation', ['id'=>$clientId]);
     }
 }

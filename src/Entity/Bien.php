@@ -84,12 +84,12 @@ class Bien
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $statut;
+    private $besoin;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="boolean")
      */
-    private $besoin;
+    private $statut;
 
     public function __construct()
     {
@@ -288,18 +288,6 @@ class Bien
         return $this;
     }
 
-    public function getStatut(): ?string
-    {
-        return $this->statut;
-    }
-
-    public function setStatut(string $statut): self
-    {
-        $this->statut = $statut;
-
-        return $this;
-    }
-
     public function getBesoin(): ?string
     {
         return $this->besoin;
@@ -308,6 +296,18 @@ class Bien
     public function setBesoin(string $besoin): self
     {
         $this->besoin = $besoin;
+
+        return $this;
+    }
+
+    public function getStatut(): ?bool
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(bool $statut): self
+    {
+        $this->statut = $statut;
 
         return $this;
     }

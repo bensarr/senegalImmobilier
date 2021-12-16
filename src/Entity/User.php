@@ -44,6 +44,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->biens = new ArrayCollection();
         $this->reglements = new ArrayCollection();
         $this->factures = new ArrayCollection();
+        $this->operations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -144,6 +145,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\OneToMany(targetEntity=Facture::class, mappedBy="agent")
      */
     private $factures;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Operation::class, mappedBy="agent")
+     */
+    private $operations;
 
 
     /**
@@ -279,6 +285,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($facture->getAgent() === $this) {
                 $facture->setAgent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Operation[]
+     */
+    public function getOperations(): Collection
+    {
+        return $this->operations;
+    }
+
+    public function addOperation(Operation $operation): self
+    {
+        if (!$this->operations->contains($operation)) {
+            $this->operations[] = $operation;
+            $operation->setAgent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOperation(Operation $operation): self
+    {
+        if ($this->operations->removeElement($operation)) {
+            // set the owning side to null (unless already changed)
+            if ($operation->getAgent() === $this) {
+                $operation->setAgent(null);
             }
         }
 

@@ -5,6 +5,11 @@
 {% block body %}
     <div class="container col-md-10 mt-5">
         <div class="card bg-transparent">
+            {% for message in app.flashes('warning') %}
+                <div class="card-header flash-notice alert-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
             {% for message in app.flashes('notice') %}
                 <div class="card-header flash-notice alert-danger">
                     {{ message }}
@@ -13,6 +18,16 @@
             <div class="card-header bg-dark text-light text-center">
                 Formulaire Agents
             </div>
+            {% if agent!=null %}
+                {% if agent.biens|length > 0 or agent.operations|length > 0%}
+                    <div class="card-header bg-secondary text-right">
+                        <button type="button" class="btn-info text-right"
+                                data-toggle="modal" data-target="#transfertModal">
+                            Transférer Dossiers
+                        </button>
+                    </div>
+                {% endif %}
+            {%endif%}
             <div class="card-body">
                 <form method="POST" action="{{ path('persiste_agent') }}">
                     <div class="form-group">
@@ -57,6 +72,48 @@
             </div>
         </div>
     </div>
+    {% if agent!=null%}
+        <!--Caissier Modal-->
+        <div class="modal fade" id="transfertModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="caissierModalLabel">Transferer Agent</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form enctype="multipart/form-data" action="{{ path('transferer_agent') }}" id="form1" method="post">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="agent" class="form-label">Agent Récepteur:</label>
+                                <select name="agent" id="agent" class="form-control">
+                                    <option value="" disabled selected></option>
+                                    {% for a in agents %}
+                                        {% if a.id != agent.id %}
+                                            <option value="{{ a.id }}">{{ a.nom }} {{ a.prenom }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group field_wrapper">
+                                <input type="hidden" name="id" value="{{ agent.id }}" id="id" class="form-control"/>
+                                <input type="hidden" name="agent_token"
+                                       value="{{ csrf_token('agent') }}"
+                                >
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button id="save" type="submit" class="btn btn-primary">Enregister</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {%endif%}
 {% endblock %}
 {% block dynamicJS%}
     <script type="application/javascript">

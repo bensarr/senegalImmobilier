@@ -20,7 +20,7 @@
                         <select required {% if operation!=null%} readonly="readonly" {%endif%} class="form-control" id="besoin" name="besoin" data-live-search="true" title="Choisissez le type d'operation">
                             <option value="" disabled selected></option>
                             {% for b in besoins %}
-                                <option value="{{ b }}">
+                                <option value="{{ b }}" {% if operation!=null and operation.type == b%} selected="selected"{%endif%}>
                                     {{ b }}
                                 </option>
                             {% endfor%}
@@ -50,15 +50,60 @@
 {% endblock %}
 {% block dynamicJS%}
     <script !src="" type="application/javascript">
+        function optionsBien(besoin) {
+            if(besoin === "Location")
+            {
+                return "{% for b in bienLocation %}"+
+                            "<option value='{{ b.id }}'>"+
+                            "{{ b.libelle }}"+
+                        "</option>"+
+                        "{% endfor%}";
+            }
+            if(besoin === "Achat")
+                return "{% for b in bienAchat %}"+
+                    "<option value='{{ b.id }}' '{% if operation!=null and operation.bien.id == b.id%} selected='selected'{%endif%}'>"+
+                        "{{ b.libelle }}\n"+
+                        "{% if b.maison!=null%}"+
+                            "(Maison: {{ b.maison.prix }} FCFA {{ b.maison.etat }})"+
+                        "{%endif%}"+
+                        "{% if b.appartement!=null%}"+
+                            "(Appartement: {{ b.appartement.nbrChambre }} Chambres {{ b.appartement.loyerMensuel }} FCFA Mensuel)"+
+                        "{%endif%}"+
+                        "{% if b.terrain!=null%}"+
+                            "(Terrain: {{ b.terrain.superficie }} m<pre>2</pre> {{ b.terrain.prix }} FCFA"+
+                        "{%endif%}"+
+                        "{% if b.studio!=null%}"+
+                            "(Studio: {{ b.studio.superficie }} m<pre>2</pre> {{ b.studio.loyerMensuel }}FCFA/mois"+
+                        "{%endif%}"+
+                    "</option>"+
+                    "{% endfor%}";
+        }
+        function displayBien(besoin) {
+            var str ="<label for='bien'>Bien de l'Opération</label>" +
+                "<select required class='form-control' id='bien' name='bien' title='Sélectionnez l Immobilier désiré' {% if operation!=null %} readonly='readonly' {%endif%}>" +
+                "<option value='' disabled selected></option>" +
+                optionsBien(besoin)+
+                "</select>"
+                + "</div>\n";
+            $('.dispayAfter').empty();
+            $('.dispayAfter').append(str);
+            $('.dispayAfter').show();
+        }
         $(document).ready(
             function (){
-                if($('#id').val() > 0)
+                if($("#id").val() > 0)
                 {
-
+                    var besoin = "{% if operation != null and operation.bien != null and operation.bien.besoin == "Location" %}{{ operation.bien.besoin }}{% else %}{{ "Achat" }}{% endif %}";
+                    displayBien(besoin);
+                    $('.btn-success').hide();
+                    $('.btn-danger').hide();
                 }
                 else
                 {
-
+                    $('#besoin').change(function () {
+                        var besoin = $('#besoin').val();
+                        displayBien(besoin);
+                    })
                 }
             });
     </script>

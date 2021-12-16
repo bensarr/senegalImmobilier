@@ -47,6 +47,11 @@ class Operation
      */
     private $facture;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="operations")
+     */
+    private $agent;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -140,6 +145,18 @@ class Operation
         }
 
         $this->facture = $facture;
+
+        return $this;
+    }
+
+    public function getAgent(): ?User
+    {
+        return $this->agent;
+    }
+
+    public function setAgent(?User $agent): self
+    {
+        $this->agent = $agent;
 
         return $this;
     }

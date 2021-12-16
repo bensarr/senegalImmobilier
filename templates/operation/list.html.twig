@@ -25,6 +25,7 @@
                         <th>Identifiant</th>
                         <th>Type</th>
                         <th>Client</th>
+                        <th>Agent</th>
                         <th>Date de MAD</th>
                         <th>Biens</th>
                         <th>Actions</th>
@@ -34,6 +35,7 @@
                             <td>{{ o.id }} </td>
                             <td>{{ o.type }} </td>
                             <td>{{ o.client.nom }} {{ o.client.prenom }} </td>
+                                <td>{{ o.agent.nom }} {{ o.agent.prenom }} </td>
                             <td>{{ o.date|date('d/m/y')  }} </td>
                             <td>
                                 Type: {% if o.bien.maison!=null%}Maison{%endif%}
@@ -46,12 +48,18 @@
                                 <a class="btn btn-info" href="{{ path('add_operation',{'id':o.client.id, 'idO':o.id } ) }}">
                                     <i class="fa fa-cogs"></i>
                                 </a>
+                                <a class="btn btn-warning" href="{{ path('list_facture',{'id': 0}) }}"><i class="fa fa-file-invoice"></i></a>
+                                {% if client != null %}
+                                    <a class="btn btn-danger" href="{{ path('delete_operation',{'id': o.id}) }}"><i class="fa fa-trash"></i></a>
+                                {% endif %}
                             </td>
-                            {# <td><a class="btn btn-primary" href="{{ path('liste_factures',{'id':a.compteur.id} ) }}"><i class="fa fa-print"></i></a></td> #}
                         </tr>
                     {% endfor %}
                 </table>
             </div>
+            {% if operations == null %}
+                <div class="card-footer text-center">Aucune facture pour ce Client</div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

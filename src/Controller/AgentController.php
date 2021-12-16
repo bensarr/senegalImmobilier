@@ -39,11 +39,58 @@ class AgentController extends AbstractController
     public function add($id): Response
     {
         $data['agent'] = $this->agentRepository->find($id);
+        $data['agents'] = $this->agentRepository->getAllByRoleNom('ROLE_AGENT');
         return $this->render('agent/add.html.twig',
             $data
         );
     }
 
+    #[Route('/agent/transferer', name: 'transferer_agent')]
+    public function transferer(Request $request): Response
+    {
+        if($request->isMethod("POST")) {
+            if ($this->isCsrfTokenValid('agent', $request->request->get('agent_token'))) {
+                $id = $request->request->get('id');
+                $agent = $request->request->get('agent');
+                $ancien = $this->agentRepository->find($id);
+                $nouveau = $this->agentRepository->find($agent);
+                if($ancien->getBiens() != null)
+                {
+                    foreach ($ancien->getBiens() as $b)
+                    {
+                        $b->setAgent($nouveau);
+                    }
+                }
+                if($ancien->getOperations() != null)
+                {
+                    foreach ($ancien->getOperations() as $o)
+                    {
+                        $o->setAgent($nouveau);
+                    }
+                }
+                $this->em->flush();
+                $this->addFlash(
+                    'warning', 'Dossiers Transférés avec succés'
+                );
+                return $this->redirectToRoute('add_agent', ['id' => $id]);
+            }
+        }
+        return $this->redirectToRoute('list_agent');
+    }
+    #[Route('/agent/delete/{id}', name: 'delete_agent')]
+    public function delete($id)
+    {
+        $a=$this->agentRepository->find($id);
+        if($a!=null)
+        {
+            $this->em->remove($a);
+            $this->em->flush();
+        }
+        $this->addFlash(
+            'notice', 'Agent Supprimé avec succés'
+        );
+        return $this->redirectToRoute('list_agent');
+    }
     #[Route('/agent/persiste', name: 'persiste_agent')]
     public function persiste(Request $request): Response
     {
