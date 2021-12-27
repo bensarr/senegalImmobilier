@@ -56,7 +56,7 @@ class BienController extends AbstractController
         if($b!=null)
         {
             $proprietaireId = $b->getProprietaire()->getId();
-            if($b->getOperations() != null)
+            if($b->getOperations()->count() > 0)
             {
                 $this->addFlash(
                     'warning', 'Suppression impossible veiller supprimer ses Operations avant tout'

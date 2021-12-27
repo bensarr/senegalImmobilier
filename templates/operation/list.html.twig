@@ -48,7 +48,7 @@
                                 <a class="btn btn-info" href="{{ path('add_operation',{'id':o.client.id, 'idO':o.id } ) }}">
                                     <i class="fa fa-cogs"></i>
                                 </a>
-                                <a class="btn btn-warning" href="{{ path('list_facture',{'id': 0}) }}"><i class="fa fa-file-invoice"></i></a>
+                                <a class="btn btn-warning" href="{{ path('list_facture',{'id': o.id}) }}"><i class="fa fa-file-invoice"></i></a>
                                 {% if client != null %}
                                     <a class="btn btn-danger" href="{{ path('delete_operation',{'id': o.id}) }}"><i class="fa fa-trash"></i></a>
                                 {% endif %}

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\OperationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -43,15 +45,20 @@ class Operation
     private $bien;
 
     /**
-     * @ORM\OneToOne(targetEntity=Facture::class, mappedBy="operation", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity=Facture::class, mappedBy="operation")
      */
-    private $facture;
+    private $factures;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="operations")
      */
     private $agent;
 
+
+    public function __construct()
+    {
+        $this->factures = new ArrayCollection();
+    }
     public function getId(): ?int
     {
         return $this->id;
@@ -127,24 +134,32 @@ class Operation
         return $this;
     }
 
-    public function getFacture(): ?Facture
+    /**
+     * @return Collection|Operation[]
+     */
+    public function getFactures(): Collection
     {
-        return $this->facture;
+        return $this->factures;
     }
 
-    public function setFacture(?Facture $facture): self
+    public function addFactures(Facture $facture): self
     {
-        // unset the owning side of the relation if necessary
-        if ($facture === null && $this->facture !== null) {
-            $this->facture->setOperation(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($facture !== null && $facture->getOperation() !== $this) {
+        if (!$this->factures->contains($facture)) {
+            $this->factures[] = $facture;
             $facture->setOperation($this);
         }
 
-        $this->facture = $facture;
+        return $this;
+    }
+
+    public function removeFacture(Facture $facture): self
+    {
+        if ($this->factures->removeElement($facture)) {
+            // set the owning side to null (unless already changed)
+            if ($facture->getOperation() === $this) {
+                $facture->setOperation(null);
+            }
+        }
 
         return $this;
     }

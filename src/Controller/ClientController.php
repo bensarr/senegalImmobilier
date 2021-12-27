@@ -81,7 +81,7 @@ class ClientController extends AbstractController
         $c=$this->clientRepository->find($id);
         if($c!=null)
         {
-            if($c->getOperations() != null)
+            if($c->getOperations()->count() >0)
             {
                 $this->addFlash(
                     'warning', 'Suppression impossible veiller supprimer ses Operations avant tout'
@@ -107,7 +107,7 @@ class ClientController extends AbstractController
                 }
                 else
                 {
-                    $operation->setDate(new \DateTime(date("Y-m-t")));
+                    $operation->setDate(new \DateTime(date("Y-m-d")));
                     $operation->setClient($client);
                     $operation->setType($request->request->get('besoin'));
                     $bien = $this->bienRepository->find($request->request->get('bien'));

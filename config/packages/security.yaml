@@ -36,7 +36,11 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/accueil$, roles:[IS_AUTHENTICATED_FULLY] }
-        - { path: ^/agent, roles: ROLE_DIRECTEUR }
-        - { path: ^/bien, roles: ROLE_AGENT }
+        - { path: ^/agent$, roles: [IS_AUTHENTICATED_FULLY, ROLE_DIRECTEUR] }
+        - { path: ^/bien$, roles: [IS_AUTHENTICATED_FULLY, ROLE_AGENT] }
+        - { path: ^/client$, roles: [IS_AUTHENTICATED_FULLY, ROLE_AGENT] }
+        - { path: ^/facture$, roles: [IS_AUTHENTICATED_FULLY, ROLE_AGENT] }
+        - { path: ^/operation$, roles: [IS_AUTHENTICATED_FULLY, ROLE_AGENT] }
+        - { path: ^/proprietaire$, roles: [IS_AUTHENTICATED_FULLY, ROLE_AGENT] }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

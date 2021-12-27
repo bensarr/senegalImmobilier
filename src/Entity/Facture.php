@@ -33,7 +33,8 @@ class Facture
     private $montant;
 
     /**
-     * @ORM\OneToOne(targetEntity=Operation::class, inversedBy="facture", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity=Operation::class, inversedBy="facture")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $operation;
 
@@ -46,6 +47,11 @@ class Facture
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="factures")
      */
     private $agent;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $etat;
 
     public function getId(): ?int
     {
@@ -130,6 +136,18 @@ class Facture
     public function setAgent(?User $agent): self
     {
         $this->agent = $agent;
+
+        return $this;
+    }
+
+    public function getEtat(): ?bool
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(bool $etat): self
+    {
+        $this->etat = $etat;
 
         return $this;
     }

@@ -1,0 +1,150 @@
+{% extends 'accueil.html.twig' %}
+
+{% block title %}Agents{% endblock %}
+
+{% block body %}
+    <div class="container col-md-10 mt-5">
+        <div class="card bg-transparent">
+            {% for message in app.flashes('notice') %}
+                <div class="card-header flash-notice alert-danger">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            <div class="card-header bg-dark text-light text-center">
+                Formulaire Facture de {{ operation.client.nom }} {{ operation.client.prenom }}
+            </div>
+            <div class="card-header bg-transparent text-right">
+                {% if facture!=null %}
+                    <a class="btn btn-success" id="reglerFacture" data-toggle="modal" data-target="#reglementModal"
+                       data-regler="{{ facture.id }}*{{ facture.montant }}*{% if facture.operation.type == "Location" %}{{ facture.date|date('Y-m') }}{% else %}{{ facture.date|date('Y-m-d') }}{% endif %}*{{ facture.num }}">
+                        Régler Fature <i class="fa fa-money-bill-alt"></i>
+                    </a>
+                    <a class="btn btn-danger" id="deleteFacture" data-toggle="modal" data-target="#deleteModal"
+                       data-delete="{{ facture.id }}*{{ facture.montant }}*{% if facture.operation.type == "Location" %}{{ facture.date|date('Y-m') }}{% else %}{{ facture.date|date('Y-m-d') }}{% endif %}*{{ facture.num }}">
+                        Supprimer Facture  <i class="fa fa-trash"></i>
+                    </a>
+                {%endif%}
+            </div>
+            </div>
+
+            <div class="card-body">
+                <form enctype="multipart/form-data" action="{{ path('persiste_facture') }}" id="form1" method="post">
+                    <div class="modal-body">
+                        {% if operation.type == "Location" %}
+                            <div class="form-group">
+                                <label for="mois" class="col-form-label">Mensualité:</label>
+                                <input type="month" required class="form-control" id="mois" name="mois" {% if facture!=null%} value="{{ facture.date|date('Y-m') }}"{%endif%}>
+                            </div>
+                        {% endif %}
+
+                        {% if operation.type == "Vente" %}
+                            <div class="form-group">
+                                <label for="date" class="col-form-label">Date de Vente:</label>
+                                <input type="date" required class="form-control" id="date" name="date" {% if facture!=null%} value="{{ facture.date|date('Y-m-d') }}"{%endif%}>
+                            </div>
+                        {% endif %}
+                        <div class="form-group">
+                            <label for="montant" class="col-form-label">Montant Facture:</label>
+                            <input type="number" required class="form-control" id="montant" name="montant" {% if facture != null %}value="{{ facture.montant }}"{% endif %}>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <a type="button" class="btn btn-secondary text-light" href="{{ path('list_facture',{'id': facture.operation.id }) }}" data-dismiss="modal">Retour</a>
+                        <button id="save" type="submit" class="btn btn-primary">Enregister</button>
+                    </div>
+                    <input type="hidden" id="id" name="id">
+                    <input type="hidden" id="idO" name="idO" value="{{ operation.id }}">
+                    <input type="hidden" name="facture_token"
+                           value="{{ csrf_token('facture') }}"
+                    >
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+<!--Suppression-->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalTitle">Suppression</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="formDelete" method="post" action="#">
+                <div class="modal-body" >
+                    <p id="contentConfirmMessage">Êtes vous sûr(e) de vouloir supprimer la facture?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--Réglement Modal-->
+<div class="modal fade" id="reglementModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reglementModalTitle">Opération Retrait</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="formRetrait" method="post" action="#">
+                <div class="modal-body">
+                    <p id="contentConfirmMessage2"></p>
+                    <div class="form-group">
+                        <label for="montantRecu" class="col-form-label">Saisir Montant Reçu:</label>
+                        <input type="number" required id="montantRecu" name="montantRecu" class="form-control">
+                        <span class="text-danger etat" hidden> hello</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success " id="btn-regler">Régler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block dynamicJS%}
+    <script type="application/javascript">
+        function initView() {
+            $('#id').val(0);
+            $('#montant').val('');
+            $('#mois').val('');
+            $('#date').val('');
+            $('#btn-regler').prop('disabled', true);
+        }
+        $(document).ready(
+            function (){
+                $("#editFacture").click(function () {
+                    let data_edit = $(this).attr("data-edit").split('*');
+                    $('#id').val(data_edit[0]);
+                    $('#montant').val(data_edit[1]);
+                    $('#mois').val(data_edit[2]);
+                    $('#date').val(data_edit[2]);
+                });
+                $("#deleteFacture").click(function (){
+                    let data_delete = $(this).attr("data-delete").split('*');
+                    $('#formDelete').attr('action', "{{ path('delete_facture',{'id': 'x'}) }}".replace('x',data_delete[0]));
+                    $('#contentConfirmMessage').empty();
+                    $('#contentConfirmMessage').append('Êtes-vous sur de vouloir supprimer la facture ['+data_delete[3]+']');
+                });
+                $("#reglerFacture").click(function (){
+                    let data_regler = $(this).attr("data-regler").split('*');
+                    $('#formRetrait').attr('action', "{{ path('regler_facture',{'id': 'x'}) }}".replace('x',data_regler[0]));
+                    $('#contentConfirmMessage2').empty();
+                    $('#contentConfirmMessage2').append('Êtes-vous sur de vouloir régler la facture ['+data_regler[3]+']');
+                });
+            }
+        );
+    </script>
+{% endblock %}

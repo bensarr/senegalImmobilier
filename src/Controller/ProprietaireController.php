@@ -89,7 +89,7 @@ class ProprietaireController extends AbstractController
         $p=$this->proprietaireRepository->find($id);
         if($p!=null)
         {
-            if($p->getBiens() != null)
+            if($p->getBiens()->count() > 0)
             {
                 $this->addFlash(
                     'warning', 'Suppression impossible veiller supprimer ses Biens avant tout'
@@ -138,6 +138,7 @@ class ProprietaireController extends AbstractController
                         $appartement->setLoyerMensuel($request->request->get('loyer'));
                         $appartement->setMontantCaution($request->request->get('caution'));
                         $appartement->setNbrChambre($request->request->get('chambres'));
+                        $appartement->setTypeBail($type);
                         $bien->setAppartement($appartement);
                     }
                     if($type == "Terrain"){
@@ -155,7 +156,7 @@ class ProprietaireController extends AbstractController
                     }
 
                     $bien->setLibelle($request->request->get('libelle'));
-                    $bien->setDate(new \DateTime(date("Y-m-t")));
+                    $bien->setDate(new \DateTime(date("Y-m-d")));
                     $bien->setStatut(true);//Dispo
                     $bien->setNumero($type."-".$proprietaire->getNumero()."-".trim($contrat->getReference()));
                     $user = $this->getUser();

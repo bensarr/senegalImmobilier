@@ -1,0 +1,61 @@
+{% extends 'accueil.html.twig' %}
+
+{% block title %}Factures{% endblock %}
+
+{% block body %}
+    <div class="container col-md-12 mt-5">
+        <div class="card bg-transparent">
+            {% for message in app.flashes('notice') %}
+                <div class="card-header flash-notice alert-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            <div class="card-header bg-dark text-light text-left">
+                {% if operation != null %}
+                    <a class="btn btn-light" href="{{ path('add_facture', {'id': operation.id, 'idF': 0}) }}">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                {% endif %}
+                Liste des Factures {% if operation != null %} du Bien [{{ operation.bien.libelle }}]{% endif %}
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tr>
+                        <th>Numero</th>
+                        <th>Date</th>
+                        <th>Montant</th>
+                        <th>Client</th>
+                        <th>Actions</th>
+                    </tr>
+                    {% for f in factures %}
+                        <tr>
+                            <td>{{ f.num }} </td>
+                            <td>
+                                {% if f.operation.type == "Location" %}
+                                    {{ f.date|date('M-Y') }}
+                                {% else %}
+                                    {{ f.date|date('d/m/y') }}
+                                {% endif %}
+                            </td>
+                            <td>{{ f.montant }}</td>
+                            <td>
+                                <u>Nom:</u> {{ f.operation.client.nom }} <br>
+                                <u>Prénom:</u> {{ f.operation.client.prenom }}
+                            </td>
+                            <td>
+                                {% if f.etat == false %}
+                                <a class="btn btn-info" href="{{ path('add_facture', {'id': operation.id, 'idF': f.id}) }}">
+                                    <i class="fa fa-cogs"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% if factures == null %}
+            <div class="card-footer text-center">Aucune facture pour cette Opération</div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
